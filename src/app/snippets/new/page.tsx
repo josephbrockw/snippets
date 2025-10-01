@@ -1,36 +1,24 @@
-import { redirect } from "next/navigation"
-import { db } from "@/db"
-import { create } from "domain";
+'use client'
+
+import { createSnippet } from "@/actions"
+import { useActionState, startTransition } from "react"
 
 export default function SnippetCreatePage() {
-    async function createSnippet(formData: FormData) {
-        // This needs to be a server action
-        "use server"
+    const [formState, action] = useActionState(
+        createSnippet,
+        { message: '' }
+    );
 
-        // check the user's inputs and amke sure they are valid
-        const title = formData.get("title") as string;
-        const code = formData.get("code") as string;
-
-        if (!title || !code) {
-            throw new Error("Title and code are required");
-        }
-
-        // create a new record in the database
-        const snippet = await db.snippet.create({
-            data: {
-                title,
-                code,
-            },
+    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        startTransition(() => {
+            action(formData);
         });
-        console.log(snippet);
-
-        // redirect the user to home page
-        redirect('/');
-        // TODO: redirect to the snippet page
     }
 
     return (
-        <form className="" action={createSnippet}>
+        <form className="" onSubmit={handleSubmit}>
             <h3 className="m-3 font-bold">Create Snippet</h3>
             <div className="flex flex-col gap-4">
                 <div className="flex gap-4">
@@ -51,8 +39,11 @@ export default function SnippetCreatePage() {
                         rows={10}
                     />
                 </div>
+                {formState.message ? (
+                    <p className="my-2 p-2 bg-red-400 border rounded border-red-400 text-white text-center">{formState.message}</p>
+                ): null}
                 <button 
-                    className="rounded p-2 bg-blue-200 w-full" 
+                    className="rounded p-2 bg-blue-200 w-full hover:bg-blue-400 disabled:opacity-50 text-white cursor-pointer" 
                     type="submit"
                 >Create</button>
             </div>
