@@ -20,6 +20,21 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
+  // ensure generated/prisma files are ignored entirely
+  {
+    ignores: ["src/generated/**", "prisma/**"]
+  },
+
+  // (optional) if those files are linted for any reason, turn off noisy rules for them
+  {
+    files: ["src/generated/**", "prisma/**"],
+    rules: {
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-this-alias": "off"
+    }
+  }
 ];
 
 export default eslintConfig;
